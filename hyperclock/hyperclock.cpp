@@ -1,4 +1,5 @@
 // https://oi.edu.pl/en/archive/ontak/2007/hip
+// Note: TLE's on one test case there, not sure why
 
 #include <bits/stdc++.h>
 
