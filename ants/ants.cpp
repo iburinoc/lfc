@@ -1,3 +1,5 @@
+// https://oi.edu.pl/en/archive/amppz/2011/drz
+
 #include <bits/stdc++.h>
 
 using namespace std;
