@@ -1,4 +1,6 @@
 // https://oi.edu.pl/en/archive/pa/2006/biu
+// Note: haven't been able to find official input for this,
+// the judge just tests against predetermined inputs
 
 #include <bits/stdc++.h>
 
