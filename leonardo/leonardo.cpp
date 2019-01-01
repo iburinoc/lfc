@@ -94,7 +94,8 @@ int main()
 {
     cin >> N >> K;
     if (N <= 1) {
-        cout << (1 + N) << endl;
+        cout << setw(9) << setfill('0') << (1 + N) << endl;
+        return 0;
     }
     initPascal();
     int maxIdx = initIdx();
