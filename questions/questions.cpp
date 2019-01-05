@@ -1,3 +1,5 @@
+// http://oi.edu.pl/en/archive/pa/2008/pyt
+
 #include <bits/stdc++.h>
 
 using namespace std;
@@ -41,15 +43,16 @@ void generate_worlds(int i, vi& cur) {
         default: assert(0);
     }
     cur.push_back(res);
-    generate_worlds(i+1);
+    generate_worlds(i+1, cur);
     cur.pop_back();
 }
 
 int N;
 vvi clas;
-vvb answer;
+vvi answer;
 
 int main() {
+    //freopen("questions.in", "rb", stdin);
     cin >> P >> V >> A;
     a0.resize(V);
     a1.resize(V);
@@ -58,10 +61,11 @@ int main() {
         cin >> a0[i] >> a1[i] >> a2[i];
     }
 
-    generate_worlds(0, vi());
+    vi _;
+    generate_worlds(0, _);
     N = worlds.size();
     clas = vvi(P, vi(N, 0));
-    answer = vvb(A, vb(N, 0));
+    answer = vvi(A, vi(N, false));
     unordered_set<int> S;
     for (int i = 0; i < N; i++) {
         S.insert(i);
@@ -72,6 +76,9 @@ int main() {
         char c;
         int g, n;
         cin >> c >> g >> n;
+        //cout << c << " " << g << " " << n << endl;
+        g--;
+        n--;
         switch (c) {
         case 'S': {
             // Prince g learns the value of n, stratify classes by value of n
@@ -87,11 +94,12 @@ int main() {
                 tie(ccl, cval, cid) = v[j];
                 if (ccl != cl || cval != val) {
                     // New class
-                    cl = cid;
+                    cl = ccl;
                     val = cval;
+                    id = cid;
                 }
-                assert(cl <= cid);
-                clas[g][cid] = cl;
+                assert(id <= cid);
+                clas[g][cid] = id;
             }
             break;
         }
@@ -167,9 +175,10 @@ int main() {
             break;
         }
         case 'M': {
+            g++;
             for (auto w : S) {
                 if (worlds[w][n] != g) {
-                    S.erase(w)
+                    S.erase(w);
                 }
             }
             break;
