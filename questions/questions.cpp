@@ -176,9 +176,11 @@ int main() {
         }
         case 'M': {
             g++;
-            for (auto w : S) {
-                if (worlds[w][n] != g) {
-                    S.erase(w);
+            for (auto it = S.begin(); it != S.end(); ) {
+                if (worlds[*it][n] != g) {
+                    it = S.erase(it);
+                } else {
+                    it++;
                 }
             }
             break;
