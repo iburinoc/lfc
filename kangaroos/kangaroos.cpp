@@ -11,14 +11,17 @@ void insert(set<pii>& I, multiset<int>& L, int v)
     int l = v;
     int r = v;
     auto it = I.lower_bound(pii(v, 0));
+    if (it != I.end()) {
+        assert(it->first > v);
+    }
     if (it != I.begin()) {
         auto il = it;
         il--;
+        assert(il->second < l);
         if (il->second + 1 == l) {
             l = il->first;
             L.erase(L.find(il->second - il->first + 1));
-            auto iq = I.erase(il);
-            assert(iq == it);
+            I.erase(il);
         }
     }
     if (it != I.end() && it->first == r + 1) {
@@ -32,10 +35,11 @@ void insert(set<pii>& I, multiset<int>& L, int v)
 
 void remove(set<pii>& I, multiset<int>& L, int v)
 {
-    auto it = I.upper_bound(pii(v, 0));
+    auto it = I.upper_bound(pii(v, INT_MAX));
     it--;
     int l = it->first;
     int r = it->second;
+    assert(l <= v && r >= v);
     L.erase(L.find(r - l + 1));
     I.erase(it);
     if (v > l) {
@@ -91,7 +95,7 @@ int main()
         } else {
             C[i] = V[it->second];
         }
-        it = upper_bound(Vs.begin(), Vs.end(), pii(C[i], INT_MAX));
+        it = upper_bound(Vs.begin(), Vs.end(), pii(D[i], INT_MAX));
         if (it == Vs.begin()) {
             D[i] = -1;
         } else {
@@ -100,12 +104,14 @@ int main()
         }
     }
 
-    int sqr = 0;
-    while (sqr * sqr < M)
+    int sqr = 1;
+    while (sqr * sqr < M && sqr < 2 * N)
         sqr++;
-    int bsize = N / sqr;
-    vector<vector<pii>> buckets(sqr + 2);
+    int bsize = 2 * N / sqr;
+    int bucket_count = 2 * N / bsize + 2;
+    vector<vector<pii>> buckets(bucket_count);
     for (int i = 0; i < M; i++) {
+        assert(C[i] >= 0);
         int bnum = C[i] / bsize;
         buckets[bnum].push_back(pii(D[i], i));
     }
@@ -113,7 +119,7 @@ int main()
     multiset<int> len;
 
     vector<int> ans(M);
-    int cc = -2, cd = -2;
+    int cc = -1, cd = -1;
     vector<bool> in(N, false);
     for (int i = 0; i < buckets.size(); i++) {
         sort(buckets[i].begin(), buckets[i].end());
@@ -121,48 +127,38 @@ int main()
             int idx = p.second;
             int c = C[idx];
             int d = D[idx];
-            if (cc < -1) {
-                for (int j = 0; j < N; j++) {
-                    if (c <= V[2 * j + 1] && d >= V[2 * j]) {
-                        insert(inter, len, j);
-                        in[j] = true;
-                    }
-                }
-                cc = c;
-                cd = d;
-            } else {
-                while (cc != c || cd != d) {
-                    int oldIdx = -1, newIdx = -1;
-                    if (cc != c) {
-                        if (cc >= 0)
-
-                            oldIdx = Yi[cc];
-                        if (cc < c)
-                            cc++;
-                        else
-                            cc--;
+            while (cc != c || cd != d) {
+                int oldIdx = -1, newIdx = -1;
+                if (cc != c) {
+                    if (cc >= 0 && cc < Yi.size())
+                        oldIdx = Yi[cc];
+                    if (cc < c)
+                        cc++;
+                    else
+                        cc--;
+                    if (cc >= 0 && cc < Yi.size())
                         newIdx = Yi[cc];
-                    } else {
-                        if (cd >= 0)
-                            oldIdx = Xi[cd];
-                        if (cd < d)
-                            cd++;
-                        else
-                            cd--;
+                } else {
+                    if (cd >= 0 && cd < Xi.size())
+                        oldIdx = Xi[cd];
+                    if (cd < d)
+                        cd++;
+                    else
+                        cd--;
+                    if (cd >= 0 && cd < Xi.size())
                         newIdx = Xi[cd];
-                    }
-                    vector<int> tp{ oldIdx, newIdx };
-                    for (auto v : tp) {
-                        if (v == -1)
-                            continue;
-                        bool inside = cc <= V[2 * v + 1] && cd >= V[2 * v];
-                        if (in[v] && !inside) {
-                            in[v] = false;
-                            remove(inter, len, v);
-                        } else if (!in[v] && inside) {
-                            in[v] = true;
-                            insert(inter, len, v);
-                        }
+                }
+                vector<int> tp{ oldIdx, newIdx };
+                for (auto v : tp) {
+                    if (v == -1)
+                        continue;
+                    bool inside = cc <= V[2 * v + 1] && cd >= V[2 * v];
+                    if (in[v] && !inside) {
+                        in[v] = false;
+                        remove(inter, len, v);
+                    } else if (!in[v] && inside) {
+                        in[v] = true;
+                        insert(inter, len, v);
                     }
                 }
             }
